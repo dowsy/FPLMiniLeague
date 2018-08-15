@@ -162,7 +162,7 @@ for j in range(1, currGW + 1):
         gwd['points by defense'] = defpoints
         gwd['points by midfield'] = midpoints
         gwd['points by forwards'] = fwpoints
-        gwpd[i.description()] = gwd
+        gwpd[i.playerid] = gwd
         print(" Game week points: {}\n "
               "Points left on bench: {}\n "
               "Points scored by defense: {}\n "
