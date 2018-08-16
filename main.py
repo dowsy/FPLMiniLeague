@@ -53,14 +53,12 @@ class Player:
         a = self.picks()
         fmtn = []
         GWfmtn = []
-        GWcap=[0, 0]
+        GWcap=[]
         for i in range(1,currGW + 1):
             for j in range(0, 15):
                 GWfmtn.append(a[i]['picks'][j]['element'])
-                if a[i]['picks'][j]['is_captain']:
-                    GWcap[0] = a[i]['picks'][j]['element']
-                elif a[i]['picks'][j]['is_vice_captain']:
-                    GWcap[1] = a[i]['picks'][j]['element']
+                if a[i]['picks'][j]['multiplier'] == 2:
+                    GWcap.append(a[i]['picks'][j]['element'])
             fmtn.append(GWfmtn)
             fmtn.append(GWcap)
         return fmtn
@@ -82,12 +80,7 @@ def classify_formation(GWfmtn):
     starting = (GWfmtn[0])[0:11]
     sub = (GWfmtn[0])[11:15]
     cap = GWfmtn[1][0]
-    vcap = GWfmtn[1][1]
-    if cap in sub:
-        if vcap in starting:
-            starting.append(vcap)
-    elif cap in starting:
-        starting.append(cap)
+    starting.append(cap)
     gk = []; df = []; mf = []; fw = []
     for k in starting:
         if lookup_pos(k) == 1:
@@ -98,7 +91,7 @@ def classify_formation(GWfmtn):
             mf.append(k)
         elif lookup_pos(k) == 4:
             fw.append(k)
-    return [gk, df, mf, fw, sub]
+    return [gk, df, mf, fw, sub, cap]
 
 
 def position_pts(gw, classified):
@@ -122,11 +115,12 @@ def position_pts(gw, classified):
     for el in classified[4]:
         a = lookup_indvpts(gw,el)
         subptslist.append(a)
+    cappts = lookup_indvpts(gw,classified[5])
     defpts = sum(gkptslist) + sum(defptslist)
     midpts = sum(midptslist)
     fwpts = sum(fwptslist)
     subpts = sum(subptslist)
-    return [defpts,midpts,fwpts,subpts]
+    return [defpts,midpts,fwpts,subpts,cappts]
 
 playerLib = []
 
@@ -156,19 +150,22 @@ for j in range(1, currGW + 1):
         defpoints = output[0]
         midpoints = output[1]
         fwpoints = output[2]
+        cappoints = output[4]
         gwd = {}
         gwd['game week points'] = gwpoints
         gwd['points left on bench'] = benchpoints
         gwd['points by defense'] = defpoints
         gwd['points by midfield'] = midpoints
         gwd['points by forwards'] = fwpoints
+        gwd['points by captain'] = cappoints
         gwpd[i.playerid] = gwd
         print(" Game week points: {}\n "
               "Points left on bench: {}\n "
               "Points scored by defense: {}\n "
               "Points scored by midfielders: {}\n "
-              "Points score by forwards: {}\n"
-              "---------------------------------------------------------------------".format(gwpoints, benchpoints, defpoints, midpoints, fwpoints))
+              "Points score by forwards: {}\n "
+              "Points score by captain: {}\n"
+              "---------------------------------------------------------------------".format(gwpoints, benchpoints, defpoints, midpoints, fwpoints, cappoints))
     data[j] = gwpd
 
 with open("data_file.json", "w") as write_file:
