@@ -55,12 +55,20 @@ class Player:
         GWfmtn = []
         GWcap=[]
         for i in range(1,currGW + 1):
+            if a[i]['active_chip'] == 'bboost':
+                GWbboost = True
+            else:
+                GWbboost = False
             for j in range(0, 15):
                 GWfmtn.append(a[i]['picks'][j]['element'])
                 if a[i]['picks'][j]['multiplier'] == 2:
                     GWcap.append(a[i]['picks'][j]['element'])
+                elif a[i]['picks'][j]['multiplier'] == 3:
+                    GWcap.append(a[i]['picks'][j]['element'])
+                    GWcap.append(a[i]['picks'][j]['element'])
             fmtn.append(GWfmtn)
             fmtn.append(GWcap)
+            fmtn.append(GWbboost)
         return fmtn
 
 def lookup_indvpts(gw,id):
@@ -77,10 +85,15 @@ def lookup_pos(id):
     return pos
 
 def classify_formation(GWfmtn):
-    starting = (GWfmtn[0])[0:11]
-    sub = (GWfmtn[0])[11:15]
-    cap = GWfmtn[1][0]
-    starting.append(cap)
+    if GWfmtn[2]:
+        starting = GWfmtn[0]
+        sub = []
+    else:
+        starting = (GWfmtn[0])[0:11]
+        sub = (GWfmtn[0])[11:15]
+    cap = GWfmtn[1]
+    for el in cap:
+        starting.append(el)
     gk = []; df = []; mf = []; fw = []
     for k in starting:
         if lookup_pos(k) == 1:
@@ -91,7 +104,7 @@ def classify_formation(GWfmtn):
             mf.append(k)
         elif lookup_pos(k) == 4:
             fw.append(k)
-    return [gk, df, mf, fw, sub, cap]
+    return [gk, df, mf, fw, sub, cap[0]]
 
 
 def position_pts(gw, classified):
