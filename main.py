@@ -106,7 +106,6 @@ def classify_formation(GWfmtn):
             fw.append(k)
     return [gk, df, mf, fw, sub, cap[0]]
 
-
 def position_pts(gw, classified):
     gkptslist = []
     defptslist = []
