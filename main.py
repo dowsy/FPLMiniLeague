@@ -25,7 +25,7 @@ class Player:
 
     def picks(self):
         gws = []
-        for i in range (1, currGW+1):
+        for i in range(1, currGW+1):
             gws.append(i)
         picks = []
         for i in gws:
@@ -52,9 +52,9 @@ class Player:
     def formation(self):
         a = self.picks()
         fmtn = []
-        GWfmtn = []
-        GWcap=[]
         for i in range(1,currGW + 1):
+            GWfmtn = []
+            GWcap=[]
             if a[i]['active_chip'] == 'bboost':
                 GWbboost = True
             else:
@@ -156,7 +156,7 @@ for j in range(1, currGW + 1):
     gwpd = {}
     for i in playerList:
         print(i.description())
-        output = (position_pts(j, (classify_formation(i.formation()))))
+        output = (position_pts(j, (classify_formation(i.formation()[(j-1) * 3:(j * 3)]))))
         gwpoints = sum(output[0:3])
         benchpoints = output[3]
         defpoints = output[0]
