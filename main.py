@@ -55,6 +55,7 @@ class Player:
         for i in range(1,currGW + 1):
             GWfmtn = []
             GWcap=[]
+            cost = a[i]["entry_history"]["event_transfers_cost"]
             if a[i]['active_chip'] == 'bboost':
                 GWbboost = True
             else:
@@ -69,6 +70,7 @@ class Player:
             fmtn.append(GWfmtn)
             fmtn.append(GWcap)
             fmtn.append(GWbboost)
+            fmtn.append(cost)
         return fmtn
 
 def lookup_indvpts(gw,id):
@@ -92,6 +94,7 @@ def classify_formation(GWfmtn):
         starting = (GWfmtn[0])[0:11]
         sub = (GWfmtn[0])[11:15]
     cap = GWfmtn[1]
+    cost = GWfmtn[3]
     for el in cap:
         starting.append(el)
     gk = []; df = []; mf = []; fw = []
@@ -104,7 +107,7 @@ def classify_formation(GWfmtn):
             mf.append(k)
         elif lookup_pos(k) == 4:
             fw.append(k)
-    return [gk, df, mf, fw, sub, cap[0]]
+    return [gk, df, mf, fw, sub, cap[0], cost]
 
 def position_pts(gw, classified):
     gkptslist = []
@@ -132,7 +135,8 @@ def position_pts(gw, classified):
     midpts = sum(midptslist)
     fwpts = sum(fwptslist)
     subpts = sum(subptslist)
-    return [defpts,midpts,fwpts,subpts,cappts]
+    cost = classified[6]
+    return [defpts,midpts,fwpts,subpts,cappts,cost]
 
 playerLib = []
 
@@ -156,8 +160,8 @@ for j in range(1, currGW + 1):
     gwpd = {}
     for i in playerList:
         print(i.description())
-        output = (position_pts(j, (classify_formation(i.formation()[(j-1) * 3:(j * 3)]))))
-        gwpoints = sum(output[0:3])
+        output = (position_pts(j, (classify_formation(i.formation()[(j-1) * 4:(j * 4)]))))
+        gwpoints = sum(output[0:3]) - output[5]
         benchpoints = output[3]
         defpoints = output[0]
         midpoints = output[1]
