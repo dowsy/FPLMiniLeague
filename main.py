@@ -153,9 +153,17 @@ playerList = []  # list to store instances
 for i in range (0, len(playerIDList)):
     playerList.append(Player(playerLib[i][0], playerLib[i][1], playerLib[i][2]))
 
+# read old json
+with open("data_file.json", "r") as read_file:
+    old_data = json.load(read_file)
+
 # Output necessary data and dump json
 data = {}
-for j in range(1, currGW + 1):
+
+for j in range(1, currGW):
+    data[j] = old_data[str(j)]
+
+for j in range(currGW - 1, currGW + 1):
     print("------------------------------------------------------------------------------------------------------------------------------------------\nGame Week " + str(j) + ":\n")
     gwpd = {}
     for i in playerList:
