@@ -77,7 +77,16 @@ def lookup_indvpts(gw,id):
     with urllib.request.urlopen("https://fantasy.premierleague.com/drf/element-summary/{}".format(id)) as u:
         indv = u.read()
         indv = json.loads(indv)
-        pt = indv['history'][gw-1]['total_points']
+        idarr = []
+        ptsarr = []
+        for i in range(0, len(indv['history'])):
+            if indv['history'][i]['round'] == gw:
+                idarr.append(i)
+        for j in idarr:
+            ptsarr.append(indv['history'][j]['total_points'])
+        pt = 0
+        for k in ptsarr:
+            pt = pt + k
     return pt
 
 def lookup_pos(id):
