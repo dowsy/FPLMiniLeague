@@ -2,17 +2,19 @@ import urllib.request
 import json
 
 
-playerIDList = [105045, 1164477, 92611, 1505241, 92236, 91449, 91225]  # List of managers IDs  in mini league
+playerIDList = [353431, 979205, 2702348, 3843035, 898689, 430222, 1114888]  # List of managers IDs  in mini league
 
 # Check current game week
-with urllib.request.urlopen("https://fantasy.premierleague.com/drf/bootstrap-static") as u:
+with urllib.request.urlopen("https://fantasy.premierleague.com/api/bootstrap-static/") as u:
     current = u.read()
     curr = json.loads(current)
-    currGW = curr["current-event"]
+    for elem in curr["events"]:
+        if elem["is_current"]:
+            currGW = elem['id']
 
-with urllib.request.urlopen("https://fantasy.premierleague.com/drf/elements/") as u:
+with urllib.request.urlopen("https://fantasy.premierleague.com/api/bootstrap-static/") as u:
     ele = u.read()
-    ele = json.loads(ele)
+    ele = json.loads(ele)['elements']
 
 class Player:
     def __init__(self, name, team, playerid):
@@ -29,7 +31,7 @@ class Player:
             gws.append(i)
         picks = []
         for i in gws:
-            with urllib.request.urlopen("https://fantasy.premierleague.com/drf/entry/{}/event/{}/picks".format(self.playerid, i)) as u:
+            with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/{}/event/{}/picks".format(self.playerid, i)) as u:
                 gwpicks = u.read()
                 gwpicks = json.loads(gwpicks)
                 picks.append(gwpicks)
@@ -74,7 +76,7 @@ class Player:
         return fmtn
 
 def lookup_indvpts(gw,id):
-    with urllib.request.urlopen("https://fantasy.premierleague.com/drf/element-summary/{}".format(id)) as u:
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/element-summary/{}".format(id)) as u:
         indv = u.read()
         indv = json.loads(indv)
         idarr = []
@@ -151,12 +153,11 @@ playerLib = []
 
 # Instantiate managers
 for el in playerIDList:
-    with urllib.request.urlopen("https://fantasy.premierleague.com/drf/entry/%s" % el) as u:
-
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/%s" % el) as u:
         playerInfo = u.read()
         inf = json.loads(playerInfo)
-        a = inf['entry']["player_first_name"] + " " + inf['entry']["player_last_name"]
-        a = [a, inf['entry']["name"], inf['entry']["id"]]
+        a = inf["player_first_name"] + " " + inf["player_last_name"]
+        a = [a, inf["name"], inf["id"]]
         playerLib.append(a)
 playerList = []  # list to store instances
 for i in range (0, len(playerIDList)):
@@ -169,10 +170,11 @@ with open("data_file.json", "r") as read_file:
 # Output necessary data and dump json
 data = {}
 
-for j in range(1, currGW):
-    data[j] = old_data[str(j)]
+# fast mode
+# for j in range(1, currGW):
+#     data[j] = old_data[str(j)]
 
-for j in range(currGW - 1, currGW + 1):
+for j in range(1, currGW + 1):
     print("------------------------------------------------------------------------------------------------------------------------------------------\nGame Week " + str(j) + ":\n")
     gwpd = {}
     for i in playerList:
@@ -203,3 +205,6 @@ for j in range(currGW - 1, currGW + 1):
 
 with open("data_file.json", "w") as write_file:
     json.dump(data, write_file)
+
+# output ranking data and dump json
+ranking = {}
