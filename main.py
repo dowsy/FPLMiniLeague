@@ -1,6 +1,6 @@
 import urllib.request
 import json
-
+from datetime import datetime
 
 playerIDList = ['353431', '979205', '2702348', '3843035', '898689', '430222', '1114888']  # List of managers IDs  in mini league
 
@@ -349,3 +349,9 @@ print(indvMatx)
 
 with open("individuals_file.json", "w") as write_file:
     json.dump(indvMatx, write_file)
+
+times = datetime.strftime(datetime.now(), "%d/%m/%y %H:%M UTC+8")
+updateMsg = ["Last update: " + str(times) + " for GW" + str(currGW)]
+print(updateMsg)
+with open("update_time.json", "w") as write_file:
+    json.dump(updateMsg, write_file)
