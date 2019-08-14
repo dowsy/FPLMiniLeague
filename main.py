@@ -283,7 +283,7 @@ for i in playerIDList:
 print(monthVisual)
 
 cum19Header = ['2019/20']
-for i in range(1,39):
+for i in range(1,currGW+1):
     cum19Header.append(str(i))
 cum1920 = [cum19Header]
 
