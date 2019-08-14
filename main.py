@@ -354,4 +354,4 @@ times = datetime.strftime(datetime.now(), "%d/%m/%y %H:%M UTC+8")
 updateMsg = ["Last update: " + str(times) + " for GW" + str(currGW)]
 print(updateMsg)
 with open("update_time.json", "w") as write_file:
-    json.dump([updateMsg], write_file)
+    json.dump([[updateMsg]], write_file)
