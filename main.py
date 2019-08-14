@@ -2,17 +2,19 @@ import urllib.request
 import json
 
 
-playerIDList = [105045, 1164477, 92611, 1505241, 92236, 91449, 91225]  # List of managers IDs  in mini league
+playerIDList = ['353431', '979205', '2702348', '3843035', '898689', '430222', '1114888']  # List of managers IDs  in mini league
 
 # Check current game week
-with urllib.request.urlopen("https://fantasy.premierleague.com/drf/bootstrap-static") as u:
+with urllib.request.urlopen("https://fantasy.premierleague.com/api/bootstrap-static/") as u:
     current = u.read()
     curr = json.loads(current)
-    currGW = curr["current-event"]
+    for elem in curr["events"]:
+        if elem["is_current"]:
+            currGW = elem['id']
 
-with urllib.request.urlopen("https://fantasy.premierleague.com/drf/elements/") as u:
+with urllib.request.urlopen("https://fantasy.premierleague.com/api/bootstrap-static/") as u:
     ele = u.read()
-    ele = json.loads(ele)
+    ele = json.loads(ele)['elements']
 
 class Player:
     def __init__(self, name, team, playerid):
@@ -29,7 +31,7 @@ class Player:
             gws.append(i)
         picks = []
         for i in gws:
-            with urllib.request.urlopen("https://fantasy.premierleague.com/drf/entry/{}/event/{}/picks".format(self.playerid, i)) as u:
+            with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/{}/event/{}/picks".format(self.playerid, i)) as u:
                 gwpicks = u.read()
                 gwpicks = json.loads(gwpicks)
                 picks.append(gwpicks)
@@ -74,7 +76,7 @@ class Player:
         return fmtn
 
 def lookup_indvpts(gw,id):
-    with urllib.request.urlopen("https://fantasy.premierleague.com/drf/element-summary/{}".format(id)) as u:
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/element-summary/{}".format(id)) as u:
         indv = u.read()
         indv = json.loads(indv)
         idarr = []
@@ -151,12 +153,11 @@ playerLib = []
 
 # Instantiate managers
 for el in playerIDList:
-    with urllib.request.urlopen("https://fantasy.premierleague.com/drf/entry/%s" % el) as u:
-
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/%s" % el) as u:
         playerInfo = u.read()
         inf = json.loads(playerInfo)
-        a = inf['entry']["player_first_name"] + " " + inf['entry']["player_last_name"]
-        a = [a, inf['entry']["name"], inf['entry']["id"]]
+        a = inf["player_first_name"] + " " + inf["player_last_name"]
+        a = [a, inf["name"], inf["id"]]
         playerLib.append(a)
 playerList = []  # list to store instances
 for i in range (0, len(playerIDList)):
@@ -169,10 +170,15 @@ with open("data_file.json", "r") as read_file:
 # Output necessary data and dump json
 data = {}
 
-for j in range(1, currGW):
-    data[j] = old_data[str(j)]
+# fast mode
+# for j in range(1, currGW):
+#     data[j] = old_data[str(j)]
 
-for j in range(currGW - 1, currGW + 1):
+nameDict = {}
+for i in range(0,len(playerIDList)):
+    nameDict.update({playerIDList[i]: playerList[i].description()})
+
+for j in range(1, currGW + 1):
     print("------------------------------------------------------------------------------------------------------------------------------------------\nGame Week " + str(j) + ":\n")
     gwpd = {}
     for i in playerList:
@@ -203,3 +209,123 @@ for j in range(currGW - 1, currGW + 1):
 
 with open("data_file.json", "w") as write_file:
     json.dump(data, write_file)
+
+with open("data_file.json") as u:
+    data = u.read()
+    data = json.loads(data)
+
+gameWeeks = []
+for i in range (1,39):
+    gameWeeks.append(str(i))
+visual = []
+
+def sum_up(indicator, name):
+    playerTotalpts = [name]
+    for j in playerIDList:
+        totalpts = []
+        for w in range(0, currGW):
+            i = gameWeeks[w]
+            totalpts.append(data[i][j][indicator])
+        summation = sum(totalpts)
+        playerTotalpts.append(summation)
+    return playerTotalpts
+
+title = ["Main Scores"]
+for i in playerIDList:
+    title.append(nameDict[i])
+matr = [title, sum_up('game week points','Overall Points'),
+        sum_up('points left on bench', 'Points left on bench'),
+        sum_up('points by defense', 'Points scored by defense'),
+        sum_up('points by midfield', 'Points scored by midfielders'),
+        sum_up('points by forwards', "Points scored by forwards"),
+        sum_up('points by captain', "Points scored by captain (x1)"),
+        ]
+for i in matr:
+    visual.append(i)
+
+mainvisual = []
+
+for i in range(0,len(title)):
+    lista = []
+    for j in range (0,len(matr)):
+        lista.append(visual[j][i])
+    mainvisual.append(lista)
+
+print(mainvisual)
+
+monthHeader = ['Manager of the Month']
+months = ['August', 'September', 'October', 'November', 'December', 'January', 'February', 'March', 'April', 'May']
+monthLimit = [0, 4, 7, 10, 14, 20, 24, 28, 31, 35, 38]
+for i in range(0, len(months)):
+    if (currGW > monthLimit[i]) and (currGW <= monthLimit[i+1]):
+        currMonth = months[i]
+        monthIndex = i
+        for j in range(0,i+1):
+            monthHeader.append(months[j])
+
+monthVisual = [monthHeader]
+
+for i in playerIDList:
+    monthPoints = [nameDict[i]]
+    for j in range(0,monthIndex):
+        weeksOfMonth = []
+        for k in range(monthLimit[j], monthLimit[j+1]):
+            weeksOfMonth.append(data[gameWeeks[k]][i]['game week points'])
+            ptsOfMonth = sum(weeksOfMonth)
+        monthPoints.append(ptsOfMonth)
+    weeksOfMonth = []
+    for l in range(monthLimit[monthIndex],currGW):
+        weeksOfMonth.append(data[gameWeeks[l]][i]['game week points'])
+        ptsOfMonth = sum(weeksOfMonth)
+    monthPoints.append(ptsOfMonth)
+    monthVisual.append(monthPoints)
+
+print(monthVisual)
+
+cum19Header = ['2019/20']
+for i in range(1,39):
+    cum19Header.append(str(i))
+cum1920 = [cum19Header]
+
+for i in playerIDList:
+    cumPoints = [nameDict[i]]
+    for j in range(0+1,currGW+1):
+        cumCal = []
+        for k in range (0,j):
+            cumCal.append(data[gameWeeks[k]][i]['game week points'])
+        cumWeek = sum(cumCal)
+        cumPoints.append(cumWeek)
+    cum1920.append(cumPoints)
+
+print(cum1920)
+
+with open("cum_file1819.json", "r", encoding="utf-8") as read_file:
+    cum1819 = json.load(read_file)
+
+with open("cum_file.json", "w") as write_file:
+    json.dump([cum1920,cum1819], write_file)
+
+rank1920 = cum1920[:]
+rankDraft = []
+
+for i in range(0, currGW+1):
+    weekMat = []
+    for j in range(1, 8):
+        weekMat.append(rank1920[j][i])
+    weekMat = sorted(weekMat,reverse=True)
+    rankDraft.append(weekMat)
+
+for i in range(1,8):
+    for j in range(1, currGW+1):
+        rank1920[i][j] = (rankDraft[j].index(rank1920[i][j])) + 1
+
+print(rank1920)
+
+with open("data_file.json", "w") as write_file:
+    json.dump([mainvisual,monthVisual], write_file)
+
+with open("ranking_file1819.json", "r", encoding="utf-8") as read_file:
+    rank1819 = json.load(read_file)
+
+with open("ranking_file.json", "w") as write_file:
+    json.dump([rank1920,rank1819], write_file)
