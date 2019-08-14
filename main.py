@@ -321,7 +321,7 @@ for i in range(1,8):
 
 print(rank1920)
 
-with open("data_file.json", "w") as write_file:
+with open("visual_file.json", "w") as write_file:
     json.dump([mainvisual,monthVisual], write_file)
 
 with open("ranking_file1819.json", "r", encoding="utf-8") as read_file:
