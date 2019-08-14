@@ -329,3 +329,23 @@ with open("ranking_file1819.json", "r", encoding="utf-8") as read_file:
 
 with open("ranking_file.json", "w") as write_file:
     json.dump([rank1920,rank1819], write_file)
+
+indvHeader = [None,'GW points', 'Bench Points', 'Defense Points', 'Midfield Points', 'Forward Points', 'Captain Points']
+indvInfo = ["game week points", "points left on bench", "points by defense", "points by midfield", "points by forwards", "points by captain"]
+indvMatx = []
+for i in playerIDList:
+    playerMatx = []
+    newHeader = indvHeader[:]
+    newHeader[0] = nameDict[i]
+    playerMatx.append(newHeader)
+    for j in range(0,currGW):
+        gw = gameWeeks[j]
+        gwRow = ['GW' + gw]
+        for k in indvInfo:
+            gwRow.append(data[gw][i][k])
+        playerMatx.append(gwRow)
+    indvMatx.append(playerMatx)
+print(indvMatx)
+
+with open("individuals_file.json", "w") as write_file:
+    json.dump(indvMatx, write_file)
