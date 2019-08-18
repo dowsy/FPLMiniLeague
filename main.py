@@ -31,7 +31,7 @@ class Player:
             gws.append(i)
         picks = []
         for i in gws:
-            with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/{}/event/{}/picks".format(self.playerid, i)) as u:
+            with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/{}/event/{}/picks/".format(self.playerid, i)) as u:
                 gwpicks = u.read()
                 gwpicks = json.loads(gwpicks)
                 picks.append(gwpicks)
@@ -76,7 +76,7 @@ class Player:
         return fmtn
 
 def lookup_indvpts(gw,id):
-    with urllib.request.urlopen("https://fantasy.premierleague.com/api/element-summary/{}".format(id)) as u:
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/element-summary/{}/".format(id)) as u:
         indv = u.read()
         indv = json.loads(indv)
         idarr = []
@@ -153,7 +153,7 @@ playerLib = []
 
 # Instantiate managers
 for el in playerIDList:
-    with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/%s" % el) as u:
+    with urllib.request.urlopen("https://fantasy.premierleague.com/api/entry/%s/" % el) as u:
         playerInfo = u.read()
         inf = json.loads(playerInfo)
         a = inf["player_first_name"] + " " + inf["player_last_name"]
