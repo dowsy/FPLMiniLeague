@@ -171,14 +171,14 @@ with open("data_file.json", "r") as read_file:
 data = {}
 
 # fast mode
-# for j in range(1, currGW):
-#     data[j] = old_data[str(j)]
+for j in range(1, currGW):
+    data[j] = old_data[str(j)]
 
 nameDict = {}
 for i in range(0,len(playerIDList)):
     nameDict.update({playerIDList[i]: playerList[i].description()})
 
-for j in range(1, currGW + 1):
+for j in range(currGW - 1, currGW + 1):
     print("------------------------------------------------------------------------------------------------------------------------------------------\nGame Week " + str(j) + ":\n")
     gwpd = {}
     for i in playerList:
