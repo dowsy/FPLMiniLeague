@@ -340,7 +340,10 @@ for i in playerIDList:
     playerMatx.append(newHeader)
     for j in range(0,currGW):
         gw = gameWeeks[j]
-        gwRow = ['GW' + gw]
+        if int(gw) < 10:
+            gwRow = ['GW0' + gw]
+        else:
+            gwRow = ['GW' + gw]
         for k in indvInfo:
             gwRow.append(data[gw][i][k])
         playerMatx.append(gwRow)
