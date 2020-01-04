@@ -118,7 +118,10 @@ def classify_formation(GWfmtn):
             mf.append(k)
         elif lookup_pos(k) == 4:
             fw.append(k)
-    return [gk, df, mf, fw, sub, cap[0], cost]
+    if len(cap) == 0:
+        return [gk, df, mf, fw, sub, None, cost]
+    else:
+        return [gk, df, mf, fw, sub, cap[0], cost]
 
 def position_pts(gw, classified):
     gkptslist = []
@@ -141,7 +144,10 @@ def position_pts(gw, classified):
     for el in classified[4]:
         a = lookup_indvpts(gw,el)
         subptslist.append(a)
-    cappts = lookup_indvpts(gw,classified[5])
+    if classified[5] == None:
+        cappts = 0
+    else:
+        cappts = lookup_indvpts(gw, classified[5])
     defpts = sum(gkptslist) + sum(defptslist)
     midpts = sum(midptslist)
     fwpts = sum(fwptslist)
@@ -171,14 +177,14 @@ with open("data_file.json", "r") as read_file:
 data = {}
 
 # fast mode
-for j in range(1, currGW):
-    data[j] = old_data[str(j)]
+# for j in range(1, currGW):
+#     data[j] = old_data[str(j)]
 
 nameDict = {}
 for i in range(0,len(playerIDList)):
     nameDict.update({playerIDList[i]: playerList[i].description()})
 
-for j in range(currGW - 1, currGW + 1):
+for j in range(1, currGW + 1):
     print("------------------------------------------------------------------------------------------------------------------------------------------\nGame Week " + str(j) + ":\n")
     gwpd = {}
     for i in playerList:
