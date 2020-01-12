@@ -144,7 +144,7 @@ def position_pts(gw, classified):
     for el in classified[4]:
         a = lookup_indvpts(gw,el)
         subptslist.append(a)
-    if classified[5] == None:
+    if classified[5] is None:
         cappts = 0
     else:
         cappts = lookup_indvpts(gw, classified[5])
